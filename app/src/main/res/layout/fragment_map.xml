@@ -1,0 +1,98 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.hunter95.mynewtrackingapp.MapFragment">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_gravity="center|bottom">
+        <!-- TODO: Update blank fragment layout -->
+        <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:map="http://schemas.android.com/apk/res-auto"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            tools:context="com.example.hunter95.mynewtrackingapp.MapsActivity"
+            class="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_weight="10" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:id="@+id/btnBotTab1layout"
+            android:layout_weight="1"
+            android:visibility="gone">
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:id="@+id/btcurrentloc"
+                android:text="Tìm Vị Trí Hiện Tại"
+                android:layout_weight="1"/>
+
+            <Button
+                android:id="@+id/btsavecurrentloc"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="Lưu vị trí hiện tại" />
+        </LinearLayout>
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:id="@+id/btnBotTab2layout"
+                android:visibility="gone">
+                <Button
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:text="@string/usemarker"
+                android:id="@+id/btnUseMarker"
+                    android:layout_weight="1"/>
+                <Button
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:text="Lưu vị trí đánh dấu"
+                android:id="@+id/btnSaveWithMarker"
+                    android:layout_weight="1"/>
+         </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:id="@+id/btnBotTab3layout"
+            android:visibility="gone">
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="@string/findRuote"
+                android:id="@+id/btnFindRuote"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:id="@+id/btnBotTab1"
+                android:text="Me"/>
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:id="@+id/btnBotTab2"
+                android:text="Marker"/>
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:id="@+id/btnBotTab3"
+                android:text="Route"/>
+        </LinearLayout>
+    </LinearLayout>
+</FrameLayout>

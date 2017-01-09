@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">MyNewTrackingApp</string>
+    <string name="title_activity_maps">Map</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="cancle">Hủy</string>
+    <string name="usemarker">Sử dụng marker</string>
+    <string name="findRuote">Tìm đường</string>
+    <string name="cancleFindRoute">Hủy Tìm Đường</string>
+    <string name="destination">Đích đến</string>
+</resources>

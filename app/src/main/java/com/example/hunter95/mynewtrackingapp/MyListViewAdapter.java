@@ -50,34 +50,34 @@ public class MyListViewAdapter extends BaseAdapter {
         if(convertView ==null)
         {
             convertView = mInflater.inflate(R.layout.listview_item,null);
-            view = new viewHolder();
-            view.txtname = (TextView) convertView.findViewById(R.id.txtname);
-            view.btdelete = (Button) convertView.findViewById(R.id.btdeleteitem);
-            view.btTrack =  (Button) convertView.findViewById(R.id.bttrack);
-            final LocationItem item = itemList.get(position);
-            view.txtname.setText(item.getName());
-            view.btdelete.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Toast.makeText(context, "Delete pressed " + item.getName(), Toast.LENGTH_SHORT).show();
-                    MainActivity main = (MainActivity) context;
-                    itemList.remove(position);
-                    notifyDataSetChanged();
-                    if(!item.removeFromDatabase(context))
-                    {
-                        Toast.makeText(context, "Delete Error " + item.getName(), Toast.LENGTH_SHORT).show();
-                    }
-                }
-            });
-            view.btTrack.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    MainActivity main = (MainActivity) context;
-                            main.track(item);
-
-                }
-            });
         }
+        view = new viewHolder();
+        view.txtname = (TextView) convertView.findViewById(R.id.txtname);
+        view.btdelete = (Button) convertView.findViewById(R.id.btdeleteitem);
+        view.btTrack =  (Button) convertView.findViewById(R.id.bttrack);
+        final LocationItem item = itemList.get(position);
+        view.txtname.setText(item.getName());
+        view.btdelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(context, "Delete pressed " + item.getName(), Toast.LENGTH_SHORT).show();
+                MainActivity main = (MainActivity) context;
+                itemList.remove(position);
+                notifyDataSetChanged();
+                if(!item.removeFromDatabase(context))
+                {
+                    Toast.makeText(context, "Delete Error " + item.getName(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        view.btTrack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MainActivity main = (MainActivity) context;
+                main.track(item);
+
+            }
+        });
         return convertView;
     }
 }

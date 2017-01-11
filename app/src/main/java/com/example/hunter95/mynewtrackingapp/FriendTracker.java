@@ -72,7 +72,8 @@ public class FriendTracker extends Fragment {
                     TextView status = (TextView) getActivity().findViewById(R.id.lbStatus);
                     status.setText("Login as: " + user.getEmail() + " ( " + user.getDisplayName() + " )");
                     MainActivity main = (MainActivity)getActivity();
-                    main.updateFriendList(main.getUserByEmail(user.getEmail()));
+                    //main.updateFriendList(main.getUserByEmail(user.getEmail()));
+                    main.updateFriendList(user.getUid());
                     Log.d("Test", "onAuthStateChanged:signed_in:" + user.getUid());
                 } else {
                     top.setVisibility(View.VISIBLE);
@@ -92,14 +93,21 @@ public class FriendTracker extends Fragment {
         swt.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked)
-                {   Intent intent = new Intent(getActivity(), TrackingService.class);
+                if(isChecked) {   /*Intent intent = new Intent(getActivity(), TrackingService.class);
                     intent.putExtra("Id", mAuth.getCurrentUser().getUid());
                     AlarmManager manager = (AlarmManager)getActivity().getSystemService(Context.ALARM_SERVICE);
                     PendingIntent alarmIntent = PendingIntent.getService(getActivity().getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
                     manager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,System.currentTimeMillis() + 1000 , 10000,alarmIntent);
+                    getActivity().startService(intent);*/
+                    Intent intent = new Intent(getActivity(), LocationService.class);
+                    intent.putExtra("Id", mAuth.getCurrentUser().getUid());
                     getActivity().startService(intent);
+                }else
+                {
+                    Intent intent = new Intent(getActivity(), LocationService.class);
+                    getActivity().stopService(intent);
                 }
+
             }
         });
         btAddFriend.setOnClickListener(new View.OnClickListener() {
@@ -107,12 +115,15 @@ public class FriendTracker extends Fragment {
             public void onClick(View v) {
                 EditText emailET = (EditText) getActivity().findViewById(R.id.txtFriendEmail);
                 MainActivity main = (MainActivity) getActivity();
-                UserInfo user = main.getUserByEmail(mAuth.getCurrentUser().getEmail());
+                /*UserInfo user = main.getUserByEmail(mAuth.getCurrentUser().getEmail());
                 if(user==null)
                 {
                     return;
                 }
-                main.addFriendEmail(emailET.getText().toString(),user);
+                main.addFriendEmail(emailET.getText().toString(),user);*/
+                ListView listFriendView = (ListView) getActivity().findViewById(R.id.lvFriendList);
+                FriendListAdapter adapter = (FriendListAdapter) listFriendView.getAdapter();
+                main.addFriendEmail(emailET.getText().toString(),mAuth.getCurrentUser().getUid(),adapter.getFriendList());
             }
         });
         btlogout.setOnClickListener(new View.OnClickListener() {

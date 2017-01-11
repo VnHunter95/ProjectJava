@@ -23,6 +23,11 @@ public class FriendListAdapter extends BaseAdapter {
         this.context = context;
         this.friendList = friendList;
     }
+
+    public ArrayList<String> getFriendList() {
+        return friendList;
+    }
+
     @Override
     public int getCount() {
         return friendList.size();
@@ -48,21 +53,21 @@ public class FriendListAdapter extends BaseAdapter {
         if(convertView ==null)
         {
             convertView = mInflater.inflate(R.layout.friendlist_item,null);
-            view = new viewHolder();
-            view.txtemail = (TextView) convertView.findViewById(R.id.txtfriendemailitem);
-            view.btTrack =  (Button) convertView.findViewById(R.id.btTrackFriend);
-            final String email = friendList.get(position);
-            view.txtemail.setText(email);
-
-            view.btTrack.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    MainActivity main = (MainActivity) context;
-                    main.trackFriend(email);
-
-                }
-            });
         }
+        view = new viewHolder();
+        view.txtemail = (TextView) convertView.findViewById(R.id.txtfriendemailitem);
+        view.btTrack =  (Button) convertView.findViewById(R.id.btTrackFriend);
+        final String email = friendList.get(position);
+        view.txtemail.setText(email);
+
+        view.btTrack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MainActivity main = (MainActivity) context;
+                main.trackFriend(email);
+
+            }
+        });
         return convertView;
     }
 }

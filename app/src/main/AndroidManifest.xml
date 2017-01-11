@@ -45,8 +45,7 @@
             </intent-filter>
         </activity>
         <service
-            android:name=".TrackingService"
-            android:exported="false"/>
+            android:name=".LocationService" android:enabled="true"/>
 
     </application>
 

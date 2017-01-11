@@ -46,10 +46,13 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
@@ -113,7 +116,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private void initFireBase() {
         database = FirebaseDatabase.getInstance().getReference();
-        database.addValueEventListener(new ValueEventListener() {
+        /*database.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 userList.clear();
@@ -126,9 +129,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                Log.e("The read failed: ", databaseError.getMessage());
+
             }
-        });
+        });*/
     }
 
         public void loadData()
@@ -155,7 +158,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private static String makeFragmentName(int viewPagerId, int index) {
         return "android:switcher:" + viewPagerId + ":" + index;
     }
-
     public void setGoogleMap(GoogleMap mMap) {
         gMap = mMap;
         if(fristLoad) {
@@ -281,9 +283,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
         loadData();
     }
-    public void addFriendEmail(String email,UserInfo user)
+    public void addFriendEmail(String email,String id,ArrayList<String> friendlist)
     {
-        ArrayList<UserInfo> temp = (ArrayList<UserInfo>) userList.clone();
+        /*ArrayList<UserInfo> temp = (ArrayList<UserInfo>) userList.clone();
         for(int i =0; i<temp.size();i++)
         {
             if(temp.get(i).getUsername().equals(user.getUsername()))
@@ -302,15 +304,28 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 return;
             }
 
+        }*/
+        Map newFriendslist = new HashMap();
+        int itemid=0;
+        for(String item:friendlist)
+        {
+            if(item.equals(email))
+            {
+                Toast.makeText(MainActivity.this,"Đã có email trong danh sách bạn !",Toast.LENGTH_SHORT).show();
+                return;
+            }
+            newFriendslist.put(String.valueOf(itemid),item);
+            itemid++;
         }
-        Toast.makeText(this,"Email is not found !",Toast.LENGTH_SHORT).show();
+        newFriendslist.put(String.valueOf(itemid), email);
+        database.child("Account").child(id).child("friendList").updateChildren(newFriendslist);
     }
     public void pushUserTest(UserInfo userInfo) {
         database.child("Account").child(userInfo.getId()).setValue(userInfo);
     }
     public UserInfo getUserByEmail(String email)
     {
-        ArrayList<UserInfo> temp = (ArrayList<UserInfo>) userList.clone();
+        /*ArrayList<UserInfo> temp = (ArrayList<UserInfo>) userList.clone();
         for(int i =0; i<temp.size();i++)
         {
             if(temp.get(i).getUsername().equals(email))
@@ -318,35 +333,85 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 return temp.get(i);
             }
 
-        }
-        Toast.makeText(this, "Error !!!", Toast.LENGTH_SHORT).show();
+        }*/
+        Query query = database.child("Account").orderByChild("username").equalTo(email);
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                UserInfo user = new UserInfo();
+                user = dataSnapshot.getValue(UserInfo.class);
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        Log.e("Test", "getUserByEmail: " + query.toString());
+        Toast.makeText(this, "Error !  getUserByEmail", Toast.LENGTH_SHORT).show();
         return null;
     }
-    public void updateFriendList(UserInfo user)
+    public void updateFriendList(String id)
     {
-        if(user==null)
-        {
-            return;
-        }
-        ListView lv = (ListView) findViewById(R.id.lvFriendList);
-        FriendListAdapter friendListAdapter = new FriendListAdapter(this,user.getFriendList());
+        final ArrayList<String> friendList = new ArrayList<>();
+        final ListView lv = (ListView) findViewById(R.id.lvFriendList);
+        final FriendListAdapter friendListAdapter = new FriendListAdapter(this, friendList);
         lv.setAdapter(friendListAdapter);
+        database.child("Account").child(id).child("friendList").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Log.e("Test", "onDataChange: Updated");
+                FriendListAdapter adapter = (FriendListAdapter) lv.getAdapter();
+                ArrayList<String> list = adapter.getFriendList();
+                list.clear();
+                Iterable<DataSnapshot> child = dataSnapshot.getChildren();
+                for (DataSnapshot data : child) {
+                    list.add(data.getValue().toString());
+                }
+                adapter.notifyDataSetChanged();
+            }
 
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     public void trackFriend(String email) {
-        final UserInfo user = getUserByEmail(email);
-        trackedUserPath = database.child("Account").child(user.getId());
+        Query query = database.child("Account").orderByChild("username").equalTo(email);
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Iterable<DataSnapshot> children = dataSnapshot.getChildren();
+                for (DataSnapshot child : children) {
+                    setLisnerOnLocationChange(child.child("id").getValue().toString());
+                    return;
+                }
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void setLisnerOnLocationChange(String id) {
+        trackedUserPath = database.child("Account").child(id);
         trackedUserPath.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 gMap.clear();
                 MarkerOptions marker = new MarkerOptions();
                 marker.title(dataSnapshot.child("username").getValue().toString());
-                LatLng trace = new LatLng( Double.valueOf(dataSnapshot.child("curAlditude").getValue().toString()),Double.valueOf(dataSnapshot.child("curLongditude").getValue().toString()));
+                LatLng trace = new LatLng(Double.valueOf(dataSnapshot.child("curAlditude").getValue().toString()), Double.valueOf(dataSnapshot.child("curLongditude").getValue().toString()));
                 marker.position(trace);
                 gMap.addMarker(marker);
-                gMap.animateCamera(CameraUpdateFactory.newLatLngZoom(trace, 14), 2000, null);
+                marker.position(trace);
+                gMap.moveCamera(CameraUpdateFactory.newLatLng(trace));
             }
 
             @Override

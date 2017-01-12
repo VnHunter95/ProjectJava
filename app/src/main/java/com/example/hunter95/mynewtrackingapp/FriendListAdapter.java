@@ -17,11 +17,18 @@ import java.util.List;
  * Created by Hunter95 on 1/2/2017.
  */
 public class FriendListAdapter extends BaseAdapter {
-    Context context;
-    ArrayList<String> friendList;
-    public FriendListAdapter(Context context, ArrayList<String> friendList) {
+    private Context context;
+    private String id;
+    private ArrayList<String> friendList;
+
+    public String getId() {
+        return id;
+    }
+
+    public FriendListAdapter(Context context, ArrayList<String> friendList, String id) {
         this.context = context;
         this.friendList = friendList;
+        this.id = id;
     }
 
     public ArrayList<String> getFriendList() {
@@ -45,6 +52,7 @@ public class FriendListAdapter extends BaseAdapter {
     private class viewHolder{
         TextView txtemail;
         Button btTrack;
+        Button btnremoveFriend;
     };
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
@@ -57,6 +65,7 @@ public class FriendListAdapter extends BaseAdapter {
         view = new viewHolder();
         view.txtemail = (TextView) convertView.findViewById(R.id.txtfriendemailitem);
         view.btTrack =  (Button) convertView.findViewById(R.id.btTrackFriend);
+        view.btnremoveFriend = (Button) convertView.findViewById(R.id.btnRemoveFriend);
         final String email = friendList.get(position);
         view.txtemail.setText(email);
 
@@ -66,6 +75,13 @@ public class FriendListAdapter extends BaseAdapter {
                 MainActivity main = (MainActivity) context;
                 main.trackFriend(email);
 
+            }
+        });
+        view.btnremoveFriend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MainActivity main = (MainActivity) context;
+                main.removeFriendEmail(email,getId());
             }
         });
         return convertView;

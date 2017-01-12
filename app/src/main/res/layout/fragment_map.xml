@@ -31,7 +31,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:id="@+id/btcurrentloc"
-                android:text="Tìm Vị Trí Hiện Tại"
+                android:text="@string/findCurLoc"
                 android:layout_weight="1"/>
 
             <Button
@@ -39,7 +39,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:text="Lưu vị trí hiện tại" />
+                android:text="@string/saveCurLoc" />
         </LinearLayout>
         <LinearLayout
                 android:layout_width="match_parent"
@@ -56,7 +56,7 @@
                 <Button
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:text="Lưu vị trí đánh dấu"
+                android:text="@string/saveMarkerLoc"
                 android:id="@+id/btnSaveWithMarker"
                     android:layout_weight="1"/>
          </LinearLayout>

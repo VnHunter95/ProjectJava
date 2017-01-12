@@ -1,10 +1,6 @@
 package com.example.hunter95.mynewtrackingapp;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -25,7 +21,6 @@ import com.google.android.gms.tasks.*;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.FirebaseDatabase;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -89,6 +84,7 @@ public class FriendTracker extends Fragment {
         Button btlogin = (Button) getActivity().findViewById(R.id.btLogin);
         Button btlogout= (Button) getActivity().findViewById(R.id.btLogout);
         Button btAddFriend = (Button) getActivity().findViewById(R.id.btAddFriend);
+        Button btnuntrack = (Button) getActivity().findViewById(R.id.btnUnTrack);
         Switch swt = (Switch) getActivity().findViewById(R.id.trackMeSwitch);
         swt.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -123,7 +119,7 @@ public class FriendTracker extends Fragment {
                 main.addFriendEmail(emailET.getText().toString(),user);*/
                 ListView listFriendView = (ListView) getActivity().findViewById(R.id.lvFriendList);
                 FriendListAdapter adapter = (FriendListAdapter) listFriendView.getAdapter();
-                main.addFriendEmail(emailET.getText().toString(),mAuth.getCurrentUser().getUid(),adapter.getFriendList());
+                main.addFriendEmail(emailET.getText().toString(), mAuth.getCurrentUser().getUid(), adapter.getFriendList());
             }
         });
         btlogout.setOnClickListener(new View.OnClickListener() {
@@ -137,7 +133,7 @@ public class FriendTracker extends Fragment {
             public void onClick(View v) {
                 EditText email = (EditText) getActivity().findViewById(R.id.txtEmail);
                 EditText pass = (EditText) getActivity().findViewById(R.id.txtEmailPass);
-                register(email.getText().toString(),pass.getText().toString());
+                register(email.getText().toString(), pass.getText().toString());
 
             }
         });
@@ -149,7 +145,13 @@ public class FriendTracker extends Fragment {
                 login(email.getText().toString(), pass.getText().toString());
             }
         });
-
+        btnuntrack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MainActivity main = (MainActivity) getActivity();
+                main.cancelTracking();
+            }
+        });
 
 
     }

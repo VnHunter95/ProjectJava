@@ -5,9 +5,14 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_main">MainActivity</string>
-    <string name="cancle">Hủy</string>
-    <string name="usemarker">Sử dụng marker</string>
-    <string name="findRuote">Tìm đường</string>
-    <string name="cancleFindRoute">Hủy Tìm Đường</string>
-    <string name="destination">Đích đến</string>
+    <string name="cancle">Cancel</string>
+    <string name="usemarker">Use Marker</string>
+    <string name="findRuote">Find Route</string>
+    <string name="cancleFindRoute">Cancel find route</string>
+    <string name="destination">Destination</string>
+    <string name="unTrack">Disable Tracking</string>
+    <string name="isnottracking">Not tracking anyone !</string>
+    <string name="saveMarkerLoc">Save Marker Location</string>
+    <string name="saveCurLoc">Save Current Location</string>
+    <string name="findCurLoc">Show Current Location</string>
 </resources>

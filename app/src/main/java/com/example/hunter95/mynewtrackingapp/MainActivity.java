@@ -3,6 +3,7 @@ package com.example.hunter95.mynewtrackingapp;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.location.LocationManager;
@@ -66,6 +67,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private LocationItem currentLoc;
     private Marker userMarker;
     private Marker maker;
+    private ValueEventListener trackingEventListener;
+    private  String curUserId;
     private boolean fristLoad=true;
     public boolean isRouting=false;
     public MarkerOptions markerOption;
@@ -283,7 +286,35 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
         loadData();
     }
-    public void addFriendEmail(String email,String id,ArrayList<String> friendlist)
+    public void removeFriendEmail(final String email,String id)
+    {
+        Query query = database.child("Account").orderByKey().equalTo(id);
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Iterable<DataSnapshot> children = dataSnapshot.getChildren();
+                for (DataSnapshot child : children) {
+                    for (DataSnapshot friendlistChild : child.child("friendList").getChildren())
+                        if (friendlistChild.getValue().toString().equals(email)) {
+                            friendlistChild.getRef().removeValue(new DatabaseReference.CompletionListener() {
+                                @Override
+                                public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                                    Toast.makeText(MainActivity.this,"Removed " + email,Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                            return;
+                        }
+                }
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+    public void addFriendEmail(final String email, final String id, final ArrayList<String> friendlist)
     {
         /*ArrayList<UserInfo> temp = (ArrayList<UserInfo>) userList.clone();
         for(int i =0; i<temp.size();i++)
@@ -305,13 +336,33 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
 
         }*/
+        Query query = database.child("Account").orderByChild("username").equalTo(email);
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot child : dataSnapshot.getChildren()) {
+
+                    insertFriendEmailOnFireBase(email, id, friendlist);
+                    return;
+                }
+                Toast.makeText(MainActivity.this,"Can't find email !",Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void insertFriendEmailOnFireBase(String email,String id,ArrayList<String> friendlist) {
         Map newFriendslist = new HashMap();
         int itemid=0;
         for(String item:friendlist)
         {
             if(item.equals(email))
             {
-                Toast.makeText(MainActivity.this,"Đã có email trong danh sách bạn !",Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this,email + " is already in your friend list !",Toast.LENGTH_SHORT).show();
                 return;
             }
             newFriendslist.put(String.valueOf(itemid),item);
@@ -320,43 +371,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         newFriendslist.put(String.valueOf(itemid), email);
         database.child("Account").child(id).child("friendList").updateChildren(newFriendslist);
     }
+
     public void pushUserTest(UserInfo userInfo) {
         database.child("Account").child(userInfo.getId()).setValue(userInfo);
-    }
-    public UserInfo getUserByEmail(String email)
-    {
-        /*ArrayList<UserInfo> temp = (ArrayList<UserInfo>) userList.clone();
-        for(int i =0; i<temp.size();i++)
-        {
-            if(temp.get(i).getUsername().equals(email))
-            {
-                return temp.get(i);
-            }
-
-        }*/
-        Query query = database.child("Account").orderByChild("username").equalTo(email);
-        query.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                UserInfo user = new UserInfo();
-                user = dataSnapshot.getValue(UserInfo.class);
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-        Log.e("Test", "getUserByEmail: " + query.toString());
-        Toast.makeText(this, "Error !  getUserByEmail", Toast.LENGTH_SHORT).show();
-        return null;
     }
     public void updateFriendList(String id)
     {
         final ArrayList<String> friendList = new ArrayList<>();
         final ListView lv = (ListView) findViewById(R.id.lvFriendList);
-        final FriendListAdapter friendListAdapter = new FriendListAdapter(this, friendList);
+        final FriendListAdapter friendListAdapter = new FriendListAdapter(this, friendList,id);
         lv.setAdapter(friendListAdapter);
         database.child("Account").child(id).child("friendList").addValueEventListener(new ValueEventListener() {
             @Override
@@ -400,8 +423,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void setLisnerOnLocationChange(String id) {
+        if(trackingEventListener!=null)
+        {
+            cancelTracking();
+        }
         trackedUserPath = database.child("Account").child(id);
-        trackedUserPath.addValueEventListener(new ValueEventListener() {
+        trackingEventListener = trackedUserPath.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 gMap.clear();
@@ -488,6 +515,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void findRouteWithMarker() {
         MarkerOptions marker = new MarkerOptions();
         marker.title("Drag me !");
+        marker.snippet("Drag and drop to find route to the marker.");
         marker.draggable(true);
         marker.position(gMap.getCameraPosition().target);
         marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
@@ -523,5 +551,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
         track(new LocationItem(0, getResources().getString(R.string.destination), userMarker.getPosition().latitude, userMarker.getPosition().longitude));
         userMarker.remove();
+    }
+
+    public void cancelTracking() {
+        if(trackingEventListener!=null) {
+            trackedUserPath.removeEventListener(trackingEventListener);
+            trackingEventListener=null;
+        }else
+        {
+            Toast.makeText(MainActivity.this,getResources().getString(R.string.isnottracking),Toast.LENGTH_SHORT).show();
+        }
+
     }
 }
